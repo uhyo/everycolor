@@ -1,0 +1,1 @@
+export { fromRGB } from "./fromRGB";
