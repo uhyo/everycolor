@@ -119,9 +119,17 @@ function twofactor(
   lightness: number
 ): string {
   const mainPart = singlePart(mainValue, mainColorId);
-  const color =
-    lightness > 0
-      ? degree256(lightness, "white", basicColors[mainColorId], mainPart)
+  if (mainValue < 128) {
+    return lightness > 0
+      ? degree128(lightness, "gray", basicColors[mainColorId], mainPart)
       : mainPart;
-  return color;
+  }
+  if (mainValue < 255) {
+    return lightness > 0
+      ? mainPart + degree256(lightness, "white", basicColors[mainColorId], "")
+      : mainPart;
+  }
+  return lightness > 0
+    ? degree256(lightness, "white", basicColors[mainColorId])
+    : mainPart;
 }
