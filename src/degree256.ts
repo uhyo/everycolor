@@ -1,14 +1,4 @@
-const words = [
-  "infinitesimal",
-  "imperceptible",
-  "slight",
-  "bit",
-  "little",
-  "somewhat",
-  "quarter",
-  "half",
-  "",
-];
+import { degreeWords } from "./degreeWords";
 
 const isPowerOf2: boolean[] = [];
 for (let i = 0; i < 256; i++) isPowerOf2[i] = false;
@@ -30,7 +20,7 @@ export function degree256(
   let result = "";
   for (let p = 8; p >= 0; p--) {
     if (v >= 1 << p) {
-      result += words[p];
+      result += degreeWords[p];
       v -= 1 << p;
     } else if (isPowerOf2[(1 << p) - v]) {
       // v = 1 => rank = 1, v = 2 => rank = 2, v = 4 => rank = 3, ...
@@ -40,10 +30,10 @@ export function degree256(
         return (
           (p === 8 ? "" : normalPrefix) +
           result +
-          words[p] +
+          degreeWords[p] +
           color +
           "but" +
-          words[rank] +
+          degreeWords[rank] +
           opposite
         );
       }
