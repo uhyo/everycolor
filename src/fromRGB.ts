@@ -36,6 +36,13 @@ export function fromRGB(r: number, g: number, b: number): string {
         // r > g === b
         return twofactor(colorRed, r, g);
       }
+      if (g > b) {
+        // r > g > b
+        return threefactor(colorRed, colorYellow, colorBlue, r, g, b);
+      } else {
+        // r > b > g
+        return threefactor(colorRed, colorFuchsia, colorLime, r, b, g);
+      }
     }
     case g: {
       if (g === b) {
@@ -46,15 +53,29 @@ export function fromRGB(r: number, g: number, b: number): string {
         // g > r === b
         return twofactor(colorLime, g, r);
       }
+      if (r > b) {
+        // g > r > b
+        return threefactor(colorLime, colorYellow, colorBlue, g, r, b);
+      } else {
+        // g > b > r
+        return threefactor(colorLime, colorAqua, colorRed, g, b, r);
+      }
     }
     case b: {
       if (r === g) {
         // b > r === g
         return twofactor(colorBlue, b, r);
       }
+      if (r > g) {
+        // b > r > g
+        return threefactor(colorBlue, colorFuchsia, colorLime, b, r, g);
+      } else {
+        // b > g > r
+        return threefactor(colorBlue, colorAqua, colorRed, b, g, r);
+      }
     }
     default: {
-      throw new Error("not implemented");
+      throw new Error("unreachable");
     }
   }
 }
@@ -132,4 +153,29 @@ function twofactor(
   return lightness > 0
     ? degree256(lightness, "white", basicColors[mainColorId])
     : mainPart;
+}
+
+function threefactor(
+  mainColorId: number,
+  sub1ColorId: number,
+  _sub2ColorId: number,
+  mainValue: number,
+  sub1Value: number,
+  sub2Value: number
+): string {
+  const mainPart = singlePart(mainValue, mainColorId);
+  const sub1Part = singlePart(sub1Value, sub1ColorId);
+  const prefix = mainPart + sub1Part;
+
+  if (mainValue < 128) {
+    return sub2Value > 0
+      ? degree128(sub2Value, "gray", basicColors[mainColorId], prefix)
+      : prefix;
+  }
+  if (mainValue < 255) {
+    return sub2Value > 0
+      ? prefix + degree256(sub2Value, "white", basicColors[mainColorId], "")
+      : prefix;
+  }
+  return sub2Value > 0 ? degree256(sub2Value, "white", prefix) : prefix;
 }
