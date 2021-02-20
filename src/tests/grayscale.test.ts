@@ -1,18 +1,16 @@
-import { fromRGB } from "../fromRGB";
+import { checkFromRGB } from "./util/checkColorNames";
 
 describe("fromRGB grayscale", () => {
   describe("basic colors", () => {
-    it.each([
+    checkFromRGB([
       [0, 0, 0, "black"],
       [128, 128, 128, "gray"],
       [192, 192, 192, "silver"],
       [255, 255, 255, "white"],
-    ])("rgb(%i, %i, %i) is %s", (r, g, b, expected) => {
-      expect(fromRGB(r, g, b)).toBe(expected);
-    });
+    ]);
   });
   describe("other colors", () => {
-    it.each([
+    checkFromRGB([
       // gray zone
       [1, 1, 1, "imperceptiblegray"],
       [2, 2, 2, "slightgray"],
@@ -45,8 +43,6 @@ describe("fromRGB grayscale", () => {
       [252, 252, 252, "whitebutlittlesilver"],
       [253, 253, 253, "silverhalfquartersomewhatlittleslightwhite"],
       [254, 254, 254, "whitebutbitsilver"],
-    ])("rgb(%i, %i, %i) is %s", (r, g, b, expected) => {
-      expect(fromRGB(r, g, b)).toBe(expected);
-    });
+    ]);
   });
 });

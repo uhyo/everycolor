@@ -1,7 +1,7 @@
-import { fromRGB } from "../fromRGB";
+import { checkFromRGB } from "./util/checkColorNames";
 
 describe("threefactor", () => {
-  it.each([
+  checkFromRGB([
     [255, 128, 64, "redolivequarterwhite"],
     [
       240,
@@ -23,7 +23,5 @@ describe("threefactor", () => {
     ],
     [1, 3, 5, "bitimperceptiblenavyslightimperceptibletealimperceptiblegray"],
     [8, 250, 68, "greenhalfquartersomewhatlittleslightlimehalfbittealbitwhite"],
-  ])("rgb(%i, %i, %i) is %s", (r, g, b, expected) => {
-    expect(fromRGB(r, g, b)).toBe(expected);
-  });
+  ]);
 });

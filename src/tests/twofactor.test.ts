@@ -1,8 +1,8 @@
-import { fromRGB } from "../fromRGB";
+import { checkFromRGB } from "./util/checkColorNames";
 
 describe("twofactor", () => {
   describe("red", () => {
-    it.each([
+    checkFromRGB([
       // basic color
       [255, 0, 0, "red"],
       [128, 0, 0, "maroon"],
@@ -44,12 +44,10 @@ describe("twofactor", () => {
         240,
         "maroonhalfquartersomewhatlittleslightredwhitebutlittlered",
       ],
-    ])("rgb(%i, %i, %i) is %s", (r, g, b, expected) => {
-      expect(fromRGB(r, g, b)).toBe(expected);
-    });
+    ]);
   });
   describe("yellow", () => {
-    it.each([
+    checkFromRGB([
       // basic color
       [255, 255, 0, "yellow"],
       [128, 128, 0, "olive"],
@@ -66,12 +64,10 @@ describe("twofactor", () => {
       // non-pure
       [9, 9, 2, "littleimperceptibleoliveslightgray"],
       [127, 127, 100, "olivebutimperceptibleblackhalfquarterbitgray"],
-    ])("rgb(%i, %i, %i) is %s", (r, g, b, expected) => {
-      expect(fromRGB(r, g, b)).toBe(expected);
-    });
+    ]);
   });
   describe("lime", () => {
-    it.each([
+    checkFromRGB([
       // basic color
       [0, 255, 0, "lime"],
       [0, 128, 0, "green"],
@@ -96,12 +92,10 @@ describe("twofactor", () => {
       [15, 34, 15, "quarterslightgreensomewhatgraybutimperceptiblelime"],
       [90, 130, 90, "greenslightlimequarterlittlebitimperceptiblewhite"],
       [128, 160, 128, "greenquarterlimehalfwhite"],
-    ])("rgb(%i, %i, %i) is %s", (r, g, b, expected) => {
-      expect(fromRGB(r, g, b)).toBe(expected);
-    });
+    ]);
   });
   describe("aqua", () => {
-    it.each([
+    checkFromRGB([
       // basic color
       [0, 255, 255, "aqua"],
       [0, 128, 128, "teal"],
@@ -125,12 +119,10 @@ describe("twofactor", () => {
       [18, 19, 19, "somewhatslightimperceptibletealsomewhatslightgray"],
       [1, 126, 126, "tealbutslightblackimperceptiblegray"],
       [240, 248, 248, "aquabutlittletealwhitebutlittleaqua"],
-    ])("rgb(%i, %i, %i) is %s", (r, g, b, expected) => {
-      expect(fromRGB(r, g, b)).toBe(expected);
-    });
+    ]);
   });
   describe("blue", () => {
-    it.each([
+    checkFromRGB([
       // basic color
       [0, 0, 255, "blue"],
       [0, 0, 128, "navy"],
@@ -163,12 +155,10 @@ describe("twofactor", () => {
         213,
         "navyhalfsomewhatbitimperceptiblebluehalfsomewhatlittlebitinfinitesimalwhite",
       ],
-    ])("rgb(%i, %i, %i) is %s", (r, g, b, expected) => {
-      expect(fromRGB(r, g, b)).toBe(expected);
-    });
+    ]);
   });
   describe("fucusia", () => {
-    it.each([
+    checkFromRGB([
       // basic color
       [255, 0, 255, "fuchsia"],
       [128, 0, 128, "purple"],
@@ -195,8 +185,6 @@ describe("twofactor", () => {
         "purplehalfquarterfuchsiasomewhatlittleimperceptiblewhite",
       ],
       [254, 1, 254, "fuchsiabutslightpurpleinfinitesimalwhite"],
-    ])("rgb(%i, %i, %i) is %s", (r, g, b, expected) => {
-      expect(fromRGB(r, g, b)).toBe(expected);
-    });
+    ]);
   });
 });
