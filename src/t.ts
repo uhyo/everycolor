@@ -1,3 +1,7 @@
 import { toRGB } from "./toRGB";
 
-console.log(toRGB("quarterslightgreensomewhatgraybutimperceptiblegreen"));
+console.log(
+  toRGB(
+    "quartersomewhatlittleslightgreenquarterimperceptibleolivesomewhatslightimperceptiblegray"
+  )
+);

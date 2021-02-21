@@ -20,6 +20,15 @@ export const colorAqua = 6;
 export const colorBlue = 8;
 export const colorFuchsia = 10;
 
+export const colorBlack = -1;
+export const colorGray = -2;
+export const colorSilver = -3;
+export const colorWhite = -4;
+
+export function isChromatic(colorId: number) {
+  return colorId >= 0;
+}
+
 export function isLightColor(colorId: number) {
   return colorId % 2 === 0;
 }

@@ -1,12 +1,17 @@
 import {
   basicColors,
   colorAqua,
+  colorBlack,
   colorBlue,
   colorFuchsia,
+  colorGray,
   colorLime,
   colorRed,
+  colorSilver,
+  colorWhite,
   colorYellow,
   flipColor,
+  isChromatic,
   isLightColor,
   normalizeToLightColor,
 } from "./basicColors";
@@ -16,7 +21,7 @@ import { vkMap } from "./utils/vkMap";
 export type RGB = { r: number; g: number; b: number };
 
 type State = RGB & {
-  mainColor: string;
+  mainColor: number;
   secondColor?: number;
   white: boolean;
 };
@@ -25,6 +30,10 @@ const initialState = 0;
 
 const degreeMap = vkMap(degreeWords);
 const basicColorsMap = vkMap(basicColors);
+basicColorsMap.set("black", colorBlack);
+basicColorsMap.set("gray", colorGray);
+basicColorsMap.set("silver", colorSilver);
+basicColorsMap.set("white", colorWhite);
 
 const degreeWordRegexp = new RegExp(
   degreeWords.filter((x) => x).join("|"),
@@ -93,16 +102,20 @@ export function toRGB(colorName: string): RGB | undefined {
 }
 
 function parse(colors: readonly [number, string][]): RGB | undefined {
-  console.log(colors);
+  // console.log(colors);
   if (colors.length === 0) {
     return undefined;
   }
 
   const [mainDeg, mainColorName] = colors[0];
-  const result: State = readMainColor(mainDeg, mainColorName);
+  const mainColorId = basicColorsMap.get(mainColorName);
+  if (mainColorId === undefined) {
+    return undefined;
+  }
+  const result: State = readMainColor(mainDeg, mainColorId);
 
   for (const [deg, colorName] of colors.slice(1)) {
-    console.log(result);
+    // console.log(result);
     if (!readSubColor(result, deg, colorName)) {
       return undefined;
     }
@@ -114,68 +127,68 @@ function parse(colors: readonly [number, string][]): RGB | undefined {
   };
 }
 
-function readMainColor(deg: number, mainColor: string): State {
+function readMainColor(deg: number, mainColor: number): State {
   switch (mainColor) {
-    case "black": {
+    case colorBlack: {
       return { r: 0, g: 0, b: 0, white: true, mainColor };
     }
-    case "gray": {
+    case colorGray: {
       const gray = readDeg(deg) >> 1;
       return { r: gray, g: gray, b: gray, white: true, mainColor };
     }
-    case "silver": {
+    case colorSilver: {
       const silver = 128 + (readDeg(deg) >> 2);
       return { r: silver, g: silver, b: silver, white: true, mainColor };
     }
-    case "white": {
+    case colorWhite: {
       const white = 192 + (readDeg(deg) >> 2);
       return { r: white, g: white, b: white, white: true, mainColor };
     }
-    case "red": {
+    case colorRed: {
       const r = readDeg(deg);
       return { r, g: 0, b: 0, white: false, mainColor };
     }
-    case "maroon": {
+    case colorRed + 1: {
       const r = readDeg(deg) >> 1;
       return { r, g: 0, b: 0, white: false, mainColor };
     }
-    case "yellow": {
+    case colorYellow: {
       const rg = readDeg(deg);
       return { r: rg, g: rg, b: 0, white: false, mainColor };
     }
-    case "olive": {
+    case colorYellow + 1: {
       const rg = readDeg(deg) >> 1;
       return { r: rg, g: rg, b: 0, white: false, mainColor };
     }
-    case "lime": {
+    case colorLime: {
       const g = readDeg(deg);
       return { r: 0, g, b: 0, white: false, mainColor };
     }
-    case "green": {
+    case colorLime + 1: {
       const g = readDeg(deg) >> 1;
       return { r: 0, g, b: 0, white: false, mainColor };
     }
-    case "aqua": {
+    case colorAqua: {
       const gb = readDeg(deg);
       return { r: 0, g: gb, b: gb, white: false, mainColor };
     }
-    case "teal": {
+    case colorAqua + 1: {
       const gb = readDeg(deg) >> 1;
       return { r: 0, g: gb, b: gb, white: false, mainColor };
     }
-    case "blue": {
+    case colorBlue: {
       const b = readDeg(deg);
       return { r: 0, g: 0, b, white: false, mainColor };
     }
-    case "navy": {
+    case colorBlue + 1: {
       const b = readDeg(deg) >> 1;
       return { r: 0, g: 0, b, white: false, mainColor };
     }
-    case "fuchsia": {
+    case colorFuchsia: {
       const rb = readDeg(deg);
       return { r: rb, g: 0, b: rb, white: false, mainColor };
     }
-    case "purple": {
+    case colorFuchsia + 1: {
       const rb = readDeg(deg) >> 1;
       return { r: rb, g: 0, b: rb, white: false, mainColor };
     }
@@ -184,45 +197,54 @@ function readMainColor(deg: number, mainColor: string): State {
 }
 
 function readSubColor(result: State, deg: number, color: string): boolean {
-  const mainColorId = basicColorsMap.get(result.mainColor);
   switch (color) {
     case "black": {
-      if (result.mainColor === "gray" && deg < 0) {
+      if (result.mainColor === colorGray && deg < 0) {
         result.r += deg >> 1;
         result.g += deg >> 1;
         result.b += deg >> 1;
         return true;
       }
-      if (mainColorId !== undefined && deg < 0) {
-        const value = deg >> (isLightColor(mainColorId) ? 0 : 1);
-        addToColor(result, mainColorId, value);
+      if (isChromatic(result.mainColor) && deg < 0) {
+        const value = deg >> (isLightColor(result.mainColor) ? 0 : 1);
+        addToColor(result, result.mainColor, value);
         return true;
       }
       break;
     }
     case "gray": {
-      if (result.mainColor === "silver" && deg < 0) {
+      if (result.mainColor === colorSilver && deg < 0) {
         result.r += deg >> 2;
         result.g += deg >> 2;
         result.b += deg >> 2;
         return true;
       }
-      if (mainColorId !== undefined) {
-        addToColor(result, flipColor(mainColorId), deg >> 1);
-        result.white = true;
-        return true;
+      if (isChromatic(result.mainColor)) {
+        if (result.secondColor === undefined) {
+          // main color is grayed
+          addToColor(result, flipColor(result.mainColor), deg >> 1);
+          result.white = true;
+          return true;
+        } else {
+          // third color
+          const addedColor = readThirdColor(result);
+          if (addedColor !== undefined) {
+            addToColor(result, addedColor, readDeg(deg) >> 1);
+            return true;
+          }
+        }
       }
       break;
     }
     case "silver": {
-      if (result.mainColor === "gray" && deg > 0) {
+      if (result.mainColor === colorGray && deg > 0) {
         const value = readDeg(deg) >> 2;
         result.r += value;
         result.g += value;
         result.b += value;
         return true;
       }
-      if (result.mainColor === "white" && deg < 0) {
+      if (result.mainColor === colorWhite && deg < 0) {
         result.r += deg >> 2;
         result.g += deg >> 2;
         result.b += deg >> 2;
@@ -231,17 +253,27 @@ function readSubColor(result: State, deg: number, color: string): boolean {
       break;
     }
     case "white": {
-      if (result.mainColor === "silver" && deg > 0) {
+      if (result.mainColor === colorSilver && deg > 0) {
         const value = readDeg(deg) >> 2;
         result.r += value;
         result.g += value;
         result.b += value;
         return true;
       }
-      if (mainColorId !== undefined) {
-        addToColor(result, flipColor(mainColorId), readDeg(deg));
-        result.white = true;
-        return true;
+      if (isChromatic(result.mainColor)) {
+        if (result.secondColor === undefined) {
+          // main color is whited
+          addToColor(result, flipColor(result.mainColor), readDeg(deg));
+          result.white = true;
+          return true;
+        } else {
+          // third color
+          const addedColor = readThirdColor(result);
+          if (addedColor !== undefined) {
+            addToColor(result, addedColor, readDeg(deg));
+            return true;
+          }
+        }
       }
       break;
     }
@@ -250,45 +282,70 @@ function readSubColor(result: State, deg: number, color: string): boolean {
       if (colorId === undefined) {
         return false;
       }
-      if (result.mainColor === "white") {
+      if (result.mainColor === colorWhite) {
         if (isLightColor(colorId)) {
           // backoff
           addToColor(result, flipColor(colorId), deg);
-          result.mainColor = color;
+          result.mainColor = colorId;
           return true;
         }
       }
-      if (mainColorId === undefined) {
+      if (!isChromatic(result.mainColor)) {
         return false;
       }
       if (result.white) {
         // backoff - seen from white
         addToColor(
           result,
-          flipColor(mainColorId),
+          flipColor(result.mainColor),
           isLightColor(colorId) ? deg : deg >> 1
         );
         return true;
       }
       result.white = false;
 
-      if (isLightColor(mainColorId)) {
+      if (result.secondColor !== undefined) {
+        if (isChromatic(colorId)) {
+          // secondColor
+          const addedColor = readSecondColor(result, colorId);
+          if (addedColor !== undefined) {
+            if (isLightColor(result.secondColor)) {
+              if (
+                deg < 0 &&
+                normalizeToLightColor(colorId) === result.secondColor
+              ) {
+                addToColor(result, addedColor, deg >> 1);
+                return true;
+              }
+            } else {
+              if (normalizeToLightColor(result.secondColor) === colorId) {
+                addToColor(result, addedColor, deg >> 1);
+                return true;
+              }
+            }
+          }
+        }
+        return false;
+      }
+      // first color
+
+      if (isLightColor(result.mainColor)) {
         // may accept backoff.
-        if (deg < 0 && normalizeToLightColor(colorId) === mainColorId) {
-          addToColor(result, mainColorId, deg >> 1);
+        if (deg < 0 && normalizeToLightColor(colorId) === result.mainColor) {
+          addToColor(result, result.mainColor, deg >> 1);
           return true;
         }
       } else {
         // forward
-        if (normalizeToLightColor(mainColorId) === colorId) {
-          addToColor(result, mainColorId, deg >> 1);
+        if (normalizeToLightColor(result.mainColor) === colorId) {
+          addToColor(result, result.mainColor, deg >> 1);
           return true;
         }
       }
-      // different color means second color
+      // different color means transition to second color
       const secondColor = readSecondColor(result, colorId);
-      if (secondColor) {
-        result.secondColor = secondColor;
+      if (secondColor !== undefined) {
+        result.secondColor = colorId;
         addToColor(
           result,
           secondColor,
@@ -305,25 +362,41 @@ function readSubColor(result: State, deg: number, color: string): boolean {
  * Second color is expressed as sibling color
  */
 function readSecondColor(result: State, colorId: number): number | undefined {
+  if (!isChromatic(result.mainColor)) {
+    return undefined;
+  }
   const colorIdN = normalizeToLightColor(colorId);
-  switch (result.mainColor) {
-    case "red": {
+  switch (normalizeToLightColor(result.mainColor)) {
+    case colorRed: {
       if (colorIdN === colorYellow) return colorLime;
+      if (colorIdN === colorYellow + 1) return colorLime + 1;
       if (colorIdN === colorFuchsia) return colorBlue;
+      if (colorIdN === colorFuchsia + 1) return colorBlue + 1;
       return undefined;
     }
-    case "lime": {
+    case colorLime: {
       if (colorIdN === colorYellow) return colorRed;
+      if (colorIdN === colorYellow + 1) return colorRed + 1;
       if (colorIdN === colorAqua) return colorBlue;
+      if (colorIdN === colorAqua + 1) return colorBlue + 1;
       return undefined;
     }
-    case "blue": {
+    case colorBlue: {
       if (colorIdN === colorAqua) return colorLime;
+      if (colorIdN === colorAqua + 1) return colorLime + 1;
       if (colorIdN === colorFuchsia) return colorRed;
+      if (colorIdN === colorFuchsia + 1) return colorRed + 1;
       return undefined;
     }
   }
   return undefined;
+}
+
+function readThirdColor(result: State): number | undefined {
+  if (!isChromatic(result.mainColor) || result.secondColor === undefined) {
+    return undefined;
+  }
+  return flipColor(normalizeToLightColor(result.secondColor));
 }
 
 function addToColor(rgb: RGB, colorId: number, value: number) {
