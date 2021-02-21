@@ -206,8 +206,20 @@ function readSubColor(result: State, deg: number, color: string): boolean {
         return true;
       }
       if (isChromatic(result.mainColor) && deg < 0) {
-        const value = deg >> (isLightColor(result.mainColor) ? 0 : 1);
-        addToColor(result, result.mainColor, value);
+        if (result.secondColor === undefined) {
+          // main color is blacked
+          const value = deg >> (isLightColor(result.mainColor) ? 0 : 1);
+          addToColor(result, result.mainColor, value);
+          return true;
+        } else {
+          // second color is blacked
+          const addedColor = readSecondColor(result, result.secondColor);
+          if (addedColor) {
+            const value = deg >> (isLightColor(result.secondColor) ? 0 : 1);
+            addToColor(result, addedColor, value);
+            return true;
+          }
+        }
         return true;
       }
       break;
