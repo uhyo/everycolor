@@ -214,7 +214,7 @@ function readSubColor(result: State, deg: number, color: string): boolean {
         } else {
           // second color is blacked
           const addedColor = readSecondColor(result, result.secondColor);
-          if (addedColor) {
+          if (addedColor !== undefined) {
             const value = deg >> (isLightColor(result.secondColor) ? 0 : 1);
             addToColor(result, addedColor, value);
             return true;
