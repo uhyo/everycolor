@@ -13,7 +13,7 @@ describe("toRGB", () => {
   describe("grayscale", () => {
     checkToRGB(grayscaleTestcases);
   });
-  describe.skip("twofactor", () => {
+  describe("twofactor", () => {
     checkToRGB(twofactorTestCases);
   });
   describe.skip("threefactor", () => {

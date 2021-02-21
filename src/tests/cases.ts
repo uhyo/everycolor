@@ -119,7 +119,7 @@ export const twofactorTestCases: readonly ColorNameTestCase[] = [
   [0, 253, 0, "greenhalfquartersomewhatlittlebitimperceptiblelime"],
   [0, 254, 0, "limebutslightgreen"],
   // non-pure
-  [15, 34, 15, "quarterslightgreensomewhatgraybutimperceptiblelime"],
+  [15, 34, 15, "quarterslightgreensomewhatgraybutimperceptiblegreen"],
   [90, 130, 90, "greenslightlimequarterlittlebitimperceptiblewhite"],
   [128, 160, 128, "greenquarterlimehalfwhite"],
   // ligher than aqua

@@ -142,7 +142,7 @@ function twofactor(
   const mainPart = singlePart(mainValue, mainColorId);
   if (mainValue < 128) {
     return lightness > 0
-      ? degree128(lightness, "gray", basicColors[mainColorId], mainPart)
+      ? degree128(lightness, "gray", basicColors[mainColorId + 1], mainPart)
       : mainPart;
   }
   if (mainValue < 255) {
