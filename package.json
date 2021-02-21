@@ -1,6 +1,6 @@
 {
   "name": "everycolor",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "Gives name to every color.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,6 +11,10 @@
   },
   "keywords": [
     "color"
+  ],
+  "files": [
+    "dist",
+    "src"
   ],
   "author": "uhyo <uhyo@uhy.ooo>",
   "license": "MIT",
