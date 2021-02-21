@@ -16,7 +16,7 @@ describe("toRGB", () => {
   describe("twofactor", () => {
     checkToRGB(twofactorTestCases);
   });
-  describe.skip("threefactor", () => {
+  describe("threefactor", () => {
     checkToRGB(threefactorTestcases);
   });
 });

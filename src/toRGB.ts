@@ -17,6 +17,7 @@ export type RGB = { r: number; g: number; b: number };
 
 type State = RGB & {
   mainColor: string;
+  secondColor?: number;
   white: boolean;
 };
 
@@ -92,15 +93,16 @@ export function toRGB(colorName: string): RGB | undefined {
 }
 
 function parse(colors: readonly [number, string][]): RGB | undefined {
-  // console.log(colors);
+  console.log(colors);
   if (colors.length === 0) {
     return undefined;
   }
 
   const [mainDeg, mainColorName] = colors[0];
-  const result = readMainColor(mainDeg, mainColorName);
+  const result: State = readMainColor(mainDeg, mainColorName);
 
   for (const [deg, colorName] of colors.slice(1)) {
+    console.log(result);
     if (!readSubColor(result, deg, colorName)) {
       return undefined;
     }
@@ -182,73 +184,73 @@ function readMainColor(deg: number, mainColor: string): State {
 }
 
 function readSubColor(result: State, deg: number, color: string): boolean {
-  switch (result.mainColor) {
-    // ----- grayscale -----
+  const mainColorId = basicColorsMap.get(result.mainColor);
+  switch (color) {
     case "black": {
-      return false;
+      if (result.mainColor === "gray" && deg < 0) {
+        result.r += deg >> 1;
+        result.g += deg >> 1;
+        result.b += deg >> 1;
+        return true;
+      }
+      if (mainColorId !== undefined && deg < 0) {
+        const value = deg >> (isLightColor(mainColorId) ? 0 : 1);
+        addToColor(result, mainColorId, value);
+        return true;
+      }
+      break;
     }
     case "gray": {
-      if (deg < 0) {
-        switch (color) {
-          case "black": {
-            const value = deg >> 1;
-            result.r += value;
-            result.g += value;
-            result.b += value;
-            break;
-          }
-        }
+      if (result.mainColor === "silver" && deg < 0) {
+        result.r += deg >> 2;
+        result.g += deg >> 2;
+        result.b += deg >> 2;
         return true;
       }
-      switch (color) {
-        case "silver": {
-          const value = readDeg(deg) >> 2;
-          result.r += value;
-          result.g += value;
-          result.b += value;
-          return true;
-        }
+      if (mainColorId !== undefined) {
+        addToColor(result, flipColor(mainColorId), deg >> 1);
+        result.white = true;
+        return true;
       }
+      break;
     }
     case "silver": {
-      if (deg < 0) {
-        switch (color) {
-          case "gray": {
-            const value = deg >> 2;
-            result.r += value;
-            result.g += value;
-            result.b += value;
-            break;
-          }
-        }
+      if (result.mainColor === "gray" && deg > 0) {
+        const value = readDeg(deg) >> 2;
+        result.r += value;
+        result.g += value;
+        result.b += value;
         return true;
       }
-      switch (color) {
-        case "white": {
-          const value = readDeg(deg) >> 2;
-          result.r += value;
-          result.g += value;
-          result.b += value;
-          return true;
-        }
+      if (result.mainColor === "white" && deg < 0) {
+        result.r += deg >> 2;
+        result.g += deg >> 2;
+        result.b += deg >> 2;
+        return true;
       }
+      break;
     }
     case "white": {
-      if (deg < 0) {
-        switch (color) {
-          case "silver": {
-            const value = deg >> 2;
-            result.r += value;
-            result.g += value;
-            result.b += value;
-            return true;
-          }
-        }
-        const colorId = basicColorsMap.get(color);
-        if (colorId === undefined) {
-          // ?
-          return false;
-        }
+      if (result.mainColor === "silver" && deg > 0) {
+        const value = readDeg(deg) >> 2;
+        result.r += value;
+        result.g += value;
+        result.b += value;
+        return true;
+      }
+      if (mainColorId !== undefined) {
+        addToColor(result, flipColor(mainColorId), readDeg(deg));
+        result.white = true;
+        return true;
+      }
+      break;
+    }
+    default: {
+      const colorId = basicColorsMap.get(color);
+      if (colorId === undefined) {
+        return false;
+      }
+      if (result.mainColor === "white") {
         if (isLightColor(colorId)) {
           // backoff
           addToColor(result, flipColor(colorId), deg);
@@ -256,39 +258,7 @@ function readSubColor(result: State, deg: number, color: string): boolean {
           return true;
         }
       }
-      // ?
-      return false;
-    }
-    // ----- non-grayscale -----
-    default: {
-      const mainColorId = basicColorsMap.get(result.mainColor);
       if (mainColorId === undefined) {
-        // ?
-        return false;
-      }
-      switch (color) {
-        case "black": {
-          if (deg < 0) {
-            const value = deg >> (isLightColor(mainColorId) ? 0 : 1);
-            addToColor(result, mainColorId, value);
-            return true;
-          }
-          break;
-        }
-        case "gray": {
-          addToColor(result, flipColor(mainColorId), deg >> 1);
-          result.white = true;
-          return true;
-        }
-        case "white": {
-          addToColor(result, flipColor(mainColorId), readDeg(deg));
-          result.white = true;
-          return true;
-        }
-      }
-      const colorId = basicColorsMap.get(color);
-      if (colorId === undefined) {
-        // ?
         return false;
       }
       if (result.white) {
@@ -303,7 +273,7 @@ function readSubColor(result: State, deg: number, color: string): boolean {
       result.white = false;
 
       if (isLightColor(mainColorId)) {
-        // may accept backoff
+        // may accept backoff.
         if (deg < 0 && normalizeToLightColor(colorId) === mainColorId) {
           addToColor(result, mainColorId, deg >> 1);
           return true;
@@ -315,9 +285,45 @@ function readSubColor(result: State, deg: number, color: string): boolean {
           return true;
         }
       }
+      // different color means second color
+      const secondColor = readSecondColor(result, colorId);
+      if (secondColor) {
+        result.secondColor = secondColor;
+        addToColor(
+          result,
+          secondColor,
+          isLightColor(colorId) ? readDeg(deg) : readDeg(deg) >> 1
+        );
+        return true;
+      }
     }
   }
   return false;
+}
+
+/**
+ * Second color is expressed as sibling color
+ */
+function readSecondColor(result: State, colorId: number): number | undefined {
+  const colorIdN = normalizeToLightColor(colorId);
+  switch (result.mainColor) {
+    case "red": {
+      if (colorIdN === colorYellow) return colorLime;
+      if (colorIdN === colorFuchsia) return colorBlue;
+      return undefined;
+    }
+    case "lime": {
+      if (colorIdN === colorYellow) return colorRed;
+      if (colorIdN === colorAqua) return colorBlue;
+      return undefined;
+    }
+    case "blue": {
+      if (colorIdN === colorAqua) return colorLime;
+      if (colorIdN === colorFuchsia) return colorRed;
+      return undefined;
+    }
+  }
+  return undefined;
 }
 
 function addToColor(rgb: RGB, colorId: number, value: number) {
