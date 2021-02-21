@@ -177,5 +177,7 @@ function threefactor(
       ? prefix + degree256(sub2Value, "white", basicColors[mainColorId], "")
       : prefix;
   }
-  return sub2Value > 0 ? degree256(sub2Value, "white", prefix) : prefix;
+  return sub2Value > 0
+    ? prefix + degree256(sub2Value, "white", basicColors[mainColorId], "")
+    : prefix;
 }
