@@ -230,6 +230,7 @@ function readSubColor(result: State, deg: number, color: string): boolean {
           const addedColor = readThirdColor(result);
           if (addedColor !== undefined) {
             addToColor(result, addedColor, readDeg(deg) >> 1);
+            result.white = true;
             return true;
           }
         }
@@ -271,6 +272,7 @@ function readSubColor(result: State, deg: number, color: string): boolean {
           const addedColor = readThirdColor(result);
           if (addedColor !== undefined) {
             addToColor(result, addedColor, readDeg(deg));
+            result.white = true;
             return true;
           }
         }
@@ -295,12 +297,22 @@ function readSubColor(result: State, deg: number, color: string): boolean {
       }
       if (result.white) {
         // backoff - seen from white
-        addToColor(
-          result,
-          flipColor(result.mainColor),
-          isLightColor(colorId) ? deg : deg >> 1
-        );
-        return true;
+        if (result.secondColor === undefined) {
+          addToColor(
+            result,
+            flipColor(result.mainColor),
+            isLightColor(colorId) ? deg : deg >> 1
+          );
+          result.white = false;
+          return true;
+        } else {
+          const addedColor = readThirdColor(result);
+          if (addedColor !== undefined) {
+            addToColor(result, addedColor, deg);
+            result.white = false;
+            return true;
+          }
+        }
       }
       result.white = false;
 

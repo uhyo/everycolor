@@ -213,4 +213,18 @@ export const threefactorTestcases: readonly ColorNameTestCase[] = [
   ],
   [1, 3, 5, "bitimperceptiblenavyslightimperceptibletealimperceptiblegray"],
   [8, 250, 68, "greenhalfquartersomewhatlittleslightlimehalfbittealbitwhite"],
+  [
+    133,
+    58,
+    99,
+    "maroonbitimperceptibleredhalfquarterslightimperceptiblepurplesomewhatlittlebitimperceptiblewhite",
+  ],
+  [
+    200,
+    201,
+    202,
+    "navyhalflittleslightbluetealhalflittleimperceptibleaquahalfquarterbitwhite",
+  ],
+  [240, 255, 224, "limeolivehalfquartersomewhatyellowhalfquartersomewhatwhite"],
+  [200, 128, 127, "maroonhalflittleredolivehalfwhitebutinfinitesimalred"],
 ];
