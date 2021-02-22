@@ -1,6 +1,6 @@
 {
   "name": "everycolor",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "Gives name to every color.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,8 @@
   ],
   "files": [
     "dist",
-    "src"
+    "src",
+    "postcss.js"
   ],
   "author": "uhyo <uhyo@uhy.ooo>",
   "license": "MIT",
